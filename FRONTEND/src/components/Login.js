@@ -4,22 +4,43 @@ import axios from "axios";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const removeHtmlEntities = (input) => {
+    // Define a regular expression pattern to match HTML entities
+    const pattern = /&[^\s]*?;/g; // This pattern matches any HTML entity
+
+    // Use the replace method with the pattern to remove HTML entities
+    return input.replace(pattern, "");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if email and password are provided
+    if (!email || !password) {
+      setErrorMessage("Please provide both email and password.");
+      return;
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/auth/authenticate",
         {
-          email,
-          password,
+          email: removeHtmlEntities(email.trim()),
+          password: removeHtmlEntities(password.trim()),
         }
       );
+
       const token = response.data.token;
-      // Store the token in local storage or state
-      console.log(token);
+      // Store the token in session storage
+      sessionStorage.setItem("token", token);
+      // Redirect to home page or perform any other action after successful login
+      console.log("Login successful");
     } catch (error) {
       console.error("Login failed:", error);
+      // Handle login failure
+      setErrorMessage("Login failed. Please check your credentials.");
     }
   };
 
@@ -41,6 +62,7 @@ const Login = () => {
         />
         <button type="submit">Login</button>
       </form>
+      {errorMessage && <p>{errorMessage}</p>}
     </div>
   );
 };
