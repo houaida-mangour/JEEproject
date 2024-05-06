@@ -27,7 +27,7 @@ const Login = () => {
       const response = await axios.post(
         "http://localhost:8080/api/v1/auth/authenticate",
         {
-          email: removeHtmlEntities(email.trim()),
+          email: (email.trim()),
           password: removeHtmlEntities(password.trim()),
         }
       );
@@ -60,7 +60,9 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Login</button>
+        <button type="submit" onClick={(e) => handleSubmit(e)}>
+          Login
+        </button>
       </form>
       {errorMessage && <p>{errorMessage}</p>}
     </div>
