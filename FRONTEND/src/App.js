@@ -4,6 +4,8 @@ import "./App.css";
 //import Header from "./components/Header";
 import AddItems from "./components/AddItem";
 import ItemList from "./components/ItemList";
+import LoginPage from "./pages/LoginPage.js";
+import RegisterPage from "./pages/RegisterPage.js";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Routes>
           <Route path="/add" element={<AddItems />} />
           <Route path="/" element={<ItemList />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </Router>
     </div>
