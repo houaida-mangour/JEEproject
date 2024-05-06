@@ -7,17 +7,13 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const removeHtmlEntities = (input) => {
-    // Define a regular expression pattern to match HTML entities
-    const pattern = /&[^\s]*?;/g; // This pattern matches any HTML entity
-
-    // Use the replace method with the pattern to remove HTML entities
+    const pattern = /&[^\s]*?;/g;
     return input.replace(pattern, "");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if email and password are provided
     if (!email || !password) {
       setErrorMessage("Please provide both email and password.");
       return;
@@ -37,7 +33,7 @@ const Login = () => {
       sessionStorage.setItem("token", token);
       // Redirect to home page or perform any other action after successful login
       console.log("Login successful");
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
       console.error("Login failed:", error);
       // Handle login failure
