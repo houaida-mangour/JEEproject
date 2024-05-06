@@ -23,7 +23,7 @@ const Login = () => {
       const response = await axios.post(
         "http://localhost:8080/api/v1/auth/authenticate",
         {
-          email: removeHtmlEntities(email.trim()),
+          email: (email.trim()),
           password: removeHtmlEntities(password.trim()),
         }
       );
