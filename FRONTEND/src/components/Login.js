@@ -37,6 +37,7 @@ const Login = () => {
       sessionStorage.setItem("token", token);
       // Redirect to home page or perform any other action after successful login
       console.log("Login successful");
+      window.location.href = '/';
     } catch (error) {
       console.error("Login failed:", error);
       // Handle login failure
@@ -60,7 +61,9 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Login</button>
+        <button type="submit" onClick={(e) => handleSubmit(e)}>
+          Login
+        </button>
       </form>
       {errorMessage && <p>{errorMessage}</p>}
     </div>
