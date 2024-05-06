@@ -8,37 +8,32 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const removeHtmlEntities = (input) => {
-    const pattern = /&[^\s]*?;/g;
-    return input.replace(pattern, "");
-  };
-
-  if (!firstname || !lastname || !email || !password) {
-    setErrorMessage("Please provide both email and password.");
-    return;
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!firstname || !lastname || !email || !password) {
+      setErrorMessage("Please provide all required information.");
+      return;
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/auth/register",
         {
-          firstname: removeHtmlEntities(firstname.trim()),
-          lastname: removeHtmlEntities(lastname.trim()),
+          firstname,
+          lastname,
           email,
           password,
         }
       );
 
       const token = response.data.token;
-      console.log("Register successful");
+      console.log("Registration successful");
       sessionStorage.setItem("token", token);
-      window.location.href = "/register";
-      // Registration successful, redirect to login or display a success message
+      // Redirect the user to the login page or dashboard
+      window.location.href = "/login";
     } catch (error) {
       console.error("Registration failed:", error);
-      setErrorMessage("Register failed!!!!!!");
+      setErrorMessage("Registration failed. Please try again later.");
     }
   };
 
@@ -70,8 +65,11 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Register</button>
+        <button type="submit" onClick={(e) => handleSubmit(e)}>
+          Register
+        </button>
       </form>
+      {errorMessage && <p>{errorMessage}</p>}
     </div>
   );
 };
