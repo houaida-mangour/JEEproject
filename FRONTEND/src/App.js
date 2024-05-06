@@ -4,8 +4,8 @@ import "./App.css";
 import Header from "./components/Header";
 import AddTasks from "./components/AddTasks";
 import TaskList from "./components/TaskList";
-import LoginPage from "./pages/loginPage";
-import Register from "./components/Register";
+import LoginPage from "./pages/LoginPage.js";
+import RegisterPage from "./pages/RegisterPage.js";
 import uuid4 from "uuid4";
 
 function App() {
@@ -47,6 +47,7 @@ function App() {
             element={<TaskList tasks={tasks} getTaskId={removeTaskHandler} />}
           />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
         {/* <AddTasks addTasksHandler={addTasksHandler}/>
     <TaskList tasks={tasks} getTaskId={removeTaskHandler}/>  */}
