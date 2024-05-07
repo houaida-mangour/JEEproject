@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Form, Input, Button } from "antd";
+import { Link } from "react-router-dom";
+import "./css/Register.css";
 
 const Register = () => {
   const [firstname, setFirstname] = useState("");
@@ -8,28 +11,28 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const removeHtmlEntities = (input) => {
+    const pattern = /&[^\s]*?;/g;
+    return input.replace(pattern, "");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!firstname || !lastname || !email || !password) {
-      setErrorMessage("Please provide all required information.");
-      return;
-    }
 
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/auth/register",
         {
-          firstname,
-          lastname,
-          email,
-          password,
+          firstname: removeHtmlEntities(firstname.trim()),
+          lastname: removeHtmlEntities(lastname.trim()),
+          email: removeHtmlEntities(email.trim()),
+          password: password,
         }
       );
 
       const token = response.data.token;
       console.log("Registration successful");
       sessionStorage.setItem("token", token);
-      // Redirect the user to the login page or dashboard
       window.location.href = "/login";
     } catch (error) {
       console.error("Registration failed:", error);
@@ -37,39 +40,77 @@ const Register = () => {
     }
   };
 
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="First Name"
-          value={firstname}
-          onChange={(e) => setFirstname(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Last Name"
-          value={lastname}
-          onChange={(e) => setLastname(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit" onClick={(e) => handleSubmit(e)}>
-          Register
-        </button>
-      </form>
-      {errorMessage && <p>{errorMessage}</p>}
+    <div className="login-page">
+      <div className="login-box">
+        <Form
+          name="login-form"
+          initialValues={{ remember: true }}
+          handleSubmit={handleSubmit}
+          onFinishFailed={onFinishFailed}
+        >
+          <p className="form-title">Register</p>
+          <Form.Item
+            name="firstname"
+            value="firstname"
+            onChange={(e) => setFirstname(e.target.value)}
+            rules={[
+              { required: true, message: "Please input your first name!" },
+            ]}
+          >
+            <Input placeholder="First Name" />
+          </Form.Item>
+
+          <Form.Item
+            name="lastname"
+            value="lastname"
+            onChange={(e) => setLastname(e.target.value)}
+            rules={[
+              { required: true, message: "Please input your last name!" },
+            ]}
+          >
+            <Input placeholder="Last Name" />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            value="email"
+            onChange={(e) => setEmail(e.target.value)}
+            rules={[{ required: true, message: "Please input your email!" }]}
+          >
+            <Input placeholder="Email" />
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            value="password"
+            onChange={(e) => setPassword(e.target.value)}
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password placeholder="Password" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
+              onClick={(e) => handleSubmit(e)}
+            >
+              REGISTER
+            </Button>
+          </Form.Item>
+          <p>
+            Already have an account? Click here to{" "}
+            <Link to="/login">Login</Link>
+          </p>
+        </Form>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+      </div>
     </div>
   );
 };

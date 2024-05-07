@@ -1,5 +1,11 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+    "axios": "^1.6.8",
+    "react-router-dom": "^6.23.0",
+    "semantic-ui-react": "^2.1.5"
+=======
     "axios": "^1.6.8"
+>>>>>>> 76df020ef52090509017e107cb8d3301d03a046c
   }
 }
