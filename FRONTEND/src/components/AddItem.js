@@ -1,29 +1,54 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
-const AddItems = (props) => {
+import { Link } from "react-router-dom";
+import axios from "axios";
+
+const AddItems = () => {
   const [state, setState] = useState({
-    itemName: "",
+    name: "",
     description: "",
     price: "",
-    category: "",
+    categoryId: "",
   });
+  const [categories, setCategories] = useState([]);
 
-  const add = (e) => {
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/v1/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
+  const add = async (e) => {
     e.preventDefault();
     if (
-      state.itemName === "" ||
-      state.description === "" ||
-      state.price === "" ||
-      state.category === ""
+      state.name.trim() === "" ||
+      state.description.trim() === "" ||
+      state.price.trim() === "" ||
+      state.categoryId.trim() === ""
     ) {
       alert("All fields are mandatory!");
       return;
     }
-    props.addItemsHandler(state);
-    setState({ itemName: "", description: "", price: "", category: "" });
-    // Optionally, navigate using Link component
-    // No need to manually push to history
+    // Check if categoryId is valid
+    const isValidCategoryId = categories.some((category) => category.id === state.categoryId);
+    if (!isValidCategoryId) {
+      alert("Invalid Category ID!");
+      return;
+    }
+    try {
+      await axios.post("http://localhost:8080/api/v1/items", state);
+      console.log("Item added:", state);
+      setState({ name: "", description: "", price: "", categoryId: "" });
+    } catch (error) {
+      console.error("Failed to add item:", error);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -39,12 +64,12 @@ const AddItems = (props) => {
       <h2>Add Item</h2>
       <form className="ui form" onSubmit={add}>
         <div className="field">
-          <label>Item</label>
+          <label>Item Name</label>
           <input
             type="text"
-            name="itemName"
-            placeholder="ItemName"
-            value={state.itemName}
+            name="name"
+            placeholder="Name"
+            value={state.name}
             onChange={handleInputChange}
           />
         </div>
@@ -70,18 +95,16 @@ const AddItems = (props) => {
         </div>
         <div className="field">
           <label>Category</label>
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            value={state.category}
-            onChange={handleInputChange}
-          />
+          <select name="categoryId" value={state.categoryId} onChange={handleInputChange}>
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>{category.name}</option>
+            ))}
+          </select>
         </div>
         <button className="ui button blue" type="submit">
           Add
         </button>
-        {/* Use Link to navigate back to ItemList */}
         <Link to="/" className="ui button">
           Back to Item List
         </Link>

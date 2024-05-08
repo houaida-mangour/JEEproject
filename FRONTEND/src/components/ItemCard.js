@@ -1,39 +1,70 @@
-import React, { useState } from "react";
+// Importer les dépendances nécessaires
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "semantic-ui-react";
 import axios from "axios";
 
-const ItemCard = ({ item, clickHandler, updateHandler }) => {
+const ItemCard = ({ item, updateHandler }) => {
+  // État local pour gérer l'affichage du modal et les données mises à jour de l'élément
   const [showModal, setShowModal] = useState(false);
   const [updatedItemData, setUpdatedItemData] = useState({
-    itemName: item.itemName,
+    name: item.name,
     description: item.description,
     price: item.price,
-    category: item.category,
+    categoryId: item.categoryId,
   });
+  
+  // État local pour stocker la liste des catégories
+  const [categories, setCategories] = useState([]);
 
+  // Effet pour charger les catégories au montage du composant
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // Fonction pour récupérer les catégories depuis l'API
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/v1/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
+  // Fonction utilitaire pour obtenir le nom de la catégorie à partir de son ID
+  const getCategoryName = (categoryId) => {
+    const category = categories.find((category) => category.id === categoryId);
+    return category ? category.name : '';
+  };
+
+  // Gestionnaire de suppression d'élément
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/items/${item.id}`);
-      clickHandler(item.id); // Trigger parent handler
+      await axios.delete(`http://localhost:8080/api/v1/items/${item.id}`);
+      // Mettre à jour l'affichage après la suppression en appelant la fonction de mise à jour
     } catch (error) {
       console.error("Failed to delete item:", error);
     }
   };
 
+  // Gestionnaire d'ouverture du modal de mise à jour
   const handleUpdate = () => {
     setShowModal(true);
   };
 
+  // Gestionnaire de sauvegarde des modifications
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8080/items/${item.id}`, updatedItemData);
-      updateHandler(item.id, updatedItemData); // Trigger parent handler
-      setShowModal(false);
+      await axios.put(`http://localhost:8080/api/v1/items/${item.id}`, updatedItemData);
+      // Déclencher le gestionnaire de mise à jour parent
+      updateHandler(item.id, updatedItemData);
+      setShowModal(false); // Fermer le modal après la sauvegarde
     } catch (error) {
       console.error("Failed to update item:", error);
     }
   };
 
+  // Gestionnaire de changement de champ de formulaire
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUpdatedItemData({ ...updatedItemData, [name]: value });
@@ -50,23 +81,23 @@ const ItemCard = ({ item, clickHandler, updateHandler }) => {
         </button>
       </div>
       <div className="content">
-        <div className="header">{item.itemName}</div>
+        <div className="header">{item.name}</div>
         <div className="description">Description: {item.description}</div>
         <div className="meta">Price: {item.price}</div>
-        <div className="meta">Category: {item.category}</div>
+        <div className="meta">Category: {getCategoryName(item.categoryId)}</div>
       </div>
 
-      {/* Modal for updating item */}
+      {/* Modal pour la mise à jour de l'élément */}
       <Modal open={showModal} onClose={() => setShowModal(false)}>
         <Modal.Header>Update item</Modal.Header>
         <Modal.Content>
           <Form>
             <Form.Field>
-              <label>item Name</label>
+              <label>Item Name</label>
               <input
                 type="text"
-                name="itemName"
-                value={updatedItemData.itemName}
+                name="name"
+                value={updatedItemData.name}
                 onChange={handleChange}
               />
             </Form.Field>
@@ -90,12 +121,16 @@ const ItemCard = ({ item, clickHandler, updateHandler }) => {
             </Form.Field>
             <Form.Field>
               <label>Category</label>
-              <input
-                type="text"
-                name="category"
-                value={updatedItemData.category}
+              <select
+                name="categoryId"
+                value={updatedItemData.categoryId}
                 onChange={handleChange}
-              />
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>{category.name}</option>
+                ))}
+              </select>
             </Form.Field>
           </Form>
         </Modal.Content>

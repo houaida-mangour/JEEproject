@@ -13,26 +13,16 @@ const ItemList = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/items");
+      const response = await axios.get("http://localhost:8080/api/v1/items");
       setItems(response.data);
     } catch (error) {
       console.error("Error fetching items:", error);
     }
   };
 
-  const deleteItemHandler = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/items/${id}`);
-      // Update items after deletion
-      fetchItems();
-    } catch (error) {
-      console.error("Failed to delete item:", error);
-    }
-  };
-
   const updateItemHandler = async (id, updatedItemData) => {
     try {
-      await axios.put(`http://localhost:8080/items/${id}`, updatedItemData);
+      await axios.put(`http://localhost:8080/api/v1/items/${id}`, updatedItemData);
       // Update items after update
       fetchItems();
     } catch (error) {
@@ -44,10 +34,11 @@ const ItemList = () => {
     <ItemCard
       key={item.id}
       item={item}
-      clickHandler={deleteItemHandler}
       updateHandler={updateItemHandler}
+      fetchItems={fetchItems} // Pass fetchItems to ItemCard
     />
   ));
+  
 
   return (
     <div className="main">
@@ -55,6 +46,9 @@ const ItemList = () => {
         Item List
         <Link to="/add">
           <button className="ui button blue right">Add Item</button>
+        </Link>
+        <Link to="/addcatg">
+          <button className="ui button blue right">Add Category</button>
         </Link>
       </h2>
       <div className="ui celled list">{renderItemList}</div>
